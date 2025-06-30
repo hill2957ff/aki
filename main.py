@@ -1,12 +1,11 @@
 from flask import Flask
 import threading
 import telebot
-import os
 import requests
 from telebot import types
 
 app = Flask(__name__)
-TOKEN = os.environ.get("TOKEN")
+TOKEN = "7635910504:AAGmtfA54LrgeUFIG3JgCOeyJW6u2Xk4m-g"
 bot = telebot.TeleBot(TOKEN)
 
 @app.route('/')
