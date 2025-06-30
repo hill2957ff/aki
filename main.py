@@ -19,9 +19,7 @@ def run_bot():
 
 if __name__ == "__main__":
     threading.Thread(target=run_bot).start()
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
-
-
+    app.run(host="0.0.0.0", port=8080)  # Hardcoded port number
 
 # Function to fetch token details from DexScreener
 def fetch_token_data(contract_address):
