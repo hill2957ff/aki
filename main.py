@@ -1,11 +1,28 @@
+from flask import Flask
+import threading
 import telebot
-from telebot import types
-import requests
-
 import os
-TOKEN = os.environ.get("TOKEN")
+import requests
+from telebot import types
 
+app = Flask(__name__)
+TOKEN = os.environ.get("TOKEN")
 bot = telebot.TeleBot(TOKEN)
+
+@app.route('/')
+def health():
+    return "Bot is running", 200
+
+def run_bot():
+    bot.polling()
+
+# All your handlers and functions here (fetch_token_data, get_sol_price, etc.)
+
+if __name__ == "__main__":
+    threading.Thread(target=run_bot).start()
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+
+
 
 # Function to fetch token details from DexScreener
 def fetch_token_data(contract_address):
@@ -460,5 +477,3 @@ def handle_contract_input(message):
     else:
         bot.send_message(message.chat.id, "❌ Invalid.")
 
-# Run bot
-bot.polling()
