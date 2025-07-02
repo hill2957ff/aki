@@ -1,28 +1,30 @@
 from flask import Flask
 import threading
 import telebot
-import requests
 from telebot import types
 
+# ✅ Replace with your real token
 TOKEN = "7635910504:AAGmtfA54LrgeUFIG3JgCOeyJW6u2Xk4m-g"
+
 bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
 
 @app.route("/")
 def health():
-    return "OK", 200  # This must return quickly for Koyeb to pass health check
+    return "OK", 200  # ✅ Fast health check for Koyeb
 
 def run_bot():
     try:
-        print("Starting bot polling...")
+        print("📡 Starting bot polling...")
         bot.polling(non_stop=True)
     except Exception as e:
-        print(f"Bot failed: {e}")
+        print(f"❌ Polling crashed: {e}")
 
 if __name__ == "__main__":
-    print("Launching Flask and bot...")
-    threading.Thread(target=run_bot).start()
-    app.run(host="0.0.0.0", port=8080)
+    print("🚀 Launching Flask and bot...")
+    threading.Thread(target=run_bot, daemon=True).start()
+    app.run(host="0.0.0.0", port=8080)  # ✅ Koyeb default port
+
 
 # Function to fetch token details from DexScreener
 def fetch_token_data(contract_address):
