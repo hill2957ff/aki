@@ -1,38 +1,39 @@
 from flask import Flask, request
 import telebot
-from telebot import types
-import requests
 
 TOKEN = "7635910504:AAGmtfA54LrgeUFIG3JgCOeyJW6u2Xk4m-g"
-WEBHOOK_URL = "https://noble-kare-hill2957ff-e0a16b3f.koyeb.app/"  # Replace with actual Koyeb domain
-
 bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
 
-# Flask route to receive webhook updates
 @app.route("/", methods=["POST"])
 def webhook():
     update = telebot.types.Update.de_json(request.data.decode("utf-8"))
     bot.process_new_updates([update])
     return "OK", 200
 
-# Simple health check route
 @app.route("/", methods=["GET"])
 def health():
     return "Bot is alive", 200
 
-# --- your start command, callback handler, and message handlers go below this (no change needed) ---
-
-# Place your @bot.message_handler and @bot.callback_query_handler functions here...
-# (Your long handlers remain unchanged and continue to work as is.)
+# This endpoint accepts the real webhook URL as a query parameter
+@app.route("/setwebhook", methods=["GET"])
+def set_webhook():
+    url = request.args.get("url")
+    if not url:
+        return "Missing 'url' parameter", 400
+    try:
+        bot.remove_webhook()
+        success = bot.set_webhook(url=url)
+        if success:
+            return f"Webhook set to {url}", 200
+        else:
+            return "Failed to set webhook", 500
+    except Exception as e:
+        return f"Error setting webhook: {e}", 500
 
 if __name__ == "__main__":
-    print("🚀 Setting webhook and launching Flask...")
-    bot.remove_webhook()
-    bot.set_webhook(url=WEBHOOK_URL)
+    print("🚀 Flask app running, webhook not set automatically.")
     app.run(host="0.0.0.0", port=8080)
-
-
 
 # Function to fetch token details from DexScreener
 def fetch_token_data(contract_address):
