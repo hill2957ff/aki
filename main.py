@@ -1,29 +1,37 @@
-from flask import Flask
-import threading
+from flask import Flask, request
 import telebot
 from telebot import types
+import requests
 
-# ✅ Replace with your real token
 TOKEN = "7635910504:AAGmtfA54LrgeUFIG3JgCOeyJW6u2Xk4m-g"
+WEBHOOK_URL = "https://noble-kare-hill2957ff-e0a16b3f.koyeb.app/"  # Replace with actual Koyeb domain
 
 bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
 
-@app.route("/")
-def health():
-    return "OK", 200  # ✅ Fast health check for Koyeb
+# Flask route to receive webhook updates
+@app.route("/", methods=["POST"])
+def webhook():
+    update = telebot.types.Update.de_json(request.data.decode("utf-8"))
+    bot.process_new_updates([update])
+    return "OK", 200
 
-def run_bot():
-    try:
-        print("📡 Starting bot polling...")
-        bot.polling(non_stop=True)
-    except Exception as e:
-        print(f"❌ Polling crashed: {e}")
+# Simple health check route
+@app.route("/", methods=["GET"])
+def health():
+    return "Bot is alive", 200
+
+# --- your start command, callback handler, and message handlers go below this (no change needed) ---
+
+# Place your @bot.message_handler and @bot.callback_query_handler functions here...
+# (Your long handlers remain unchanged and continue to work as is.)
 
 if __name__ == "__main__":
-    print("🚀 Launching Flask and bot...")
-    threading.Thread(target=run_bot, daemon=True).start()
-    app.run(host="0.0.0.0", port=8080)  # ✅ Koyeb default port
+    print("🚀 Setting webhook and launching Flask...")
+    bot.remove_webhook()
+    bot.set_webhook(url=WEBHOOK_URL)
+    app.run(host="0.0.0.0", port=8080)
+
 
 
 # Function to fetch token details from DexScreener
